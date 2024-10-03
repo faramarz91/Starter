@@ -4,6 +4,9 @@ import Home from "@/views/Home.vue";
 import Dashboard from "@/views/Dashboard.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import Login from "@/views/auth/Login.vue";
+import Register from "@/views/auth/Register.vue";
+import DashboardLayout from "@/layouts/DashboardLayout.vue";
+import {useUserStore} from "@/stores/user.js";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,23 +17,51 @@ const router = createRouter({
             component: DefaultLayout,
             children: [
                 {path: '', component: Home},
-                {path: 'dashboard', component: Dashboard},
             ]
 
         },
         {
-            path: '/auth',
-            redirect: '/auth/login',
+            path: '/',
+            component: DashboardLayout,
+            name: 'dashboard',
+            meta: {requiresAuth: true},
+            children: [
+                {path: 'dashboard', component: Dashboard},
+            ]
+        },
+        {
+            path: '/',
             component: AuthLayout,
             children: [
                 {
                     path: 'login',
                     name: 'login',
                     component: Login,
+                },
+                {
+                    path: 'register',
+                    name: 'register',
+                    component: Register,
                 }
             ]
+        },
+        {
+            path: '/logout',
+            name: 'logout',
         }
     ]
+})
+router.beforeEach((to, from, next) => {
+    if (to.meta.requiresAuth && !useUserStore().info.token) {
+        next({name: 'login'})
+    } else if (useUserStore().info.token && (to.name === 'login' || to.name === 'register')) {
+        next({name: 'dashboard'})
+    } else if (useUserStore().info.token && to.name === 'logout') {
+        useUserStore().logout();
+        next({name: 'home'})
+    }else {
+        next()
+    }
 })
 
 export default router
