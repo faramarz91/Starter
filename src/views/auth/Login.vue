@@ -2,7 +2,7 @@
     <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form class="space-y-6" action="#" method="POST">
+        <form ref="loginData" @submit.prevent="login" class="space-y-6" action="#" method="POST">
 <!--            email-->
             <div>
                 <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
@@ -50,5 +50,8 @@
         </p>
     </div>
 </template>
-<script setup lang="ts">
+<script setup>
+    const login = () => {
+
+    }
 </script>

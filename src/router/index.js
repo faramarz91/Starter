@@ -15,8 +15,9 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: DefaultLayout,
+            meta: {isGuest: true},
             children: [
-                {path: '', component: Home},
+                {path: '', component: Home, name: 'home'},
             ]
 
         },
@@ -26,12 +27,13 @@ const router = createRouter({
             name: 'dashboard',
             meta: {requiresAuth: true},
             children: [
-                {path: 'dashboard', component: Dashboard},
+                {path: 'dashboard', component: Dashboard, name: 'dashboard'},
             ]
         },
         {
             path: '/',
             component: AuthLayout,
+            meta: {isGuest: true},
             children: [
                 {
                     path: 'login',
@@ -52,9 +54,10 @@ const router = createRouter({
     ]
 })
 router.beforeEach((to, from, next) => {
+    document.title = 'NC | '+ to.name.toUpperCase()
     if (to.meta.requiresAuth && !useUserStore().info.token) {
         next({name: 'login'})
-    } else if (useUserStore().info.token && (to.name === 'login' || to.name === 'register')) {
+    } else if (useUserStore().info.token && to.meta.isGuest) {
         next({name: 'dashboard'})
     } else if (useUserStore().info.token && to.name === 'logout') {
         useUserStore().logout();
